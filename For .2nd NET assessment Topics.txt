@@ -1,0 +1,1 @@
+For .NET next assessment we can consider --> C# and Controller based ASP.NET Core Web APIs : Collections, Exception Handling, LINQ, Delegates, Lambda Expressions, Async Programming, ASP.NET Core Architecture, REST APIs, Controllers, Routing, Dependency Injection and LINQ.
