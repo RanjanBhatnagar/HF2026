@@ -1,0 +1,138 @@
+1. Create ASP.NET Core Controller based Web API
+2. Add Microsoft.AspNetCore.Authentication.JwtBearer package respective to your framework
+3. Add json to appsettings.json
+	"Jwt":{
+	    	"Key": "ThisIsMySecretKeyForJwtAuthentication12345",
+	    	"Issuer": "JwtDemoApi",
+	    	"Audience": "JwtDemoClient"
+	      },
+
+4. Program.cs : Here Swagger Gen UI addition of Authorize section activated and on the other part creating configuration for JWT.
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Add services to the container.
+
+        builder.Services.AddControllers();
+
+        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter your JWT token",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "bearer"
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
+
+
+        var jwt = builder.Configuration.GetSection("Jwt");
+
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidIssuer = jwt["Issuer"],
+                ValidAudience = jwt["Audience"],
+
+                IssuerSigningKey =
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!))
+            };
+        });
+
+        builder.Services.AddAuthorization();
+
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthentication();   // MUST come first
+        app.UseAuthorization();    //After Authentication
+
+
+        app.MapControllers();
+
+        app.Run();
+    }
+}
+  
+
+5. Add new API Empty controller named AuthController
+public class AuthController : ControllerBase
+{
+    private readonly IConfiguration _configuration;
+
+    public AuthController(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
+    [HttpPost("login")]
+    public IActionResult Login(string username, string password)
+    {
+        // Hardcoded user
+        if (username != "admin" || password != "123")
+            return Unauthorized();
+
+        var claims = new[]
+        {
+        new Claim(ClaimTypes.Name, username),
+        new Claim(ClaimTypes.Role,"Admin")
+    };
+
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+
+        var creds = new SigningCredentials(
+            key,
+            SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(30),
+            signingCredentials: creds);
+
+        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return Ok(jwt);
+    }
+}
