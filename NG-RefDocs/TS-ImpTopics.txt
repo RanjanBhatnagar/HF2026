@@ -1,0 +1,24 @@
+TypeScript vs JavaScript
+Variables
+Data types
+Type inference
+Arrays
+Tuples
+Enums
+Interfaces
+Classes
+Access modifiers
+Constructors
+Optional properties
+Union types
+Type aliases
+Generics
+Functions
+Arrow functions
+Optional parameters
+Default parameters
+Destructuring
+Spread operator
+Modules
+async/await
+Promises
