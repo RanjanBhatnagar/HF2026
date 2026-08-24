@@ -1,0 +1,40 @@
+To opt back into zone.js in Angular 21 (where zoneless is now the default for new applications), you must explicitly install the package,
+configure your application bootstrap, and declare the polyfill.Follow these three steps to add zone.js back into your application:
+
+1. Install the LibraryFirst, ensure that the package is present in your project's dependencies:
+bash
+
+npm install zone.js
+
+2. Configure the PolyfillOpen your angular.json file. 
+Locate your project under the projects object and add zone.js to the polyfills array under the build target:
+json
+
+"projects": {
+  "your-app-name": {
+    "architect": {
+      "build": {
+        "options": {
+          "polyfills": [
+            "zone.js"
+          ]
+        }
+      }
+    }
+  }
+}
+
+3. Register the ProviderOpen your main application configuration file (usually app.config.ts or main.ts). 
+
+Import provideZoneChangeDetection and add it to your root providers array:typescript
+
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideZoneChangeDetection } from '@angular/core';
+import { AppComponent } from './app/app.component';
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideZoneChangeDetection() // Enables Zone-based change detection
+  ]
+}).catch(err => console.error(err));
+
