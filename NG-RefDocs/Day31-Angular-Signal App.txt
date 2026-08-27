@@ -1,0 +1,14 @@
+1. Traditional Counter: <app-traditional-counter></app-traditional-counter> 
+2. Understand Problem First: <app-samplecomponent></app-samplecomponent>
+3. Solution using Signals: <app-signalcomp></app-signalcomp>
+<h3 All in One App.</h3>
+4. Using Signal APIs: <app-signal-component></app-signal-component>
+5. First Component — Counter : <app-counter></app-counter>
+6. Computed Signal : <app-computed-signal></app-computed-signal>
+7. More Practical Computed Signal: <app-employee-statistics></app-employee-statistics>
+8. Another Example : <app-price-computed></app-price-computed>
+9. Effect Example : <app-count-effect></app-count-effect>
+10. Theme Switcher Example: <app-theme-switcher></app-theme-switcher>
+11. Signal with @If and @For : <app-employee-search></app-employee-search>
+12. Component Communication using Signals: <app-parent-component></app-parent-component>
+13. Using model() th ModelSignal : <app-parent-model-comp></app-parent-model-comp>
